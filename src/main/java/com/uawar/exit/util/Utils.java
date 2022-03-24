@@ -17,7 +17,7 @@ public class Utils {
             return LocalDate.parse(date, DateTimeFormatter.ofPattern("uuuu-M-d", Locale.US))
                     .atStartOfDay().toInstant(ZoneOffset.UTC);
         } catch (Exception e) {
-            log.error("Failed to parse date: " + date);
+            log.warn("Failed to parse date: " + date);
             return null;
         }
     }

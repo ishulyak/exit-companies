@@ -18,7 +18,6 @@ public interface AirtableCompanyMapper extends BaseMapper<AirtableCompany, Airta
     @Override
     @Mappings({
             @Mapping(expression = "java(Utils.parseDate(airtableCompany.getAnnouncementDate()))", target = "announcementDate"),
-//            @Mapping(source = "airtableCompany.hQCountry", target = "hQCountry")
     })
     Company toEntity(AirtableCompany airtableCompany, String id);
 
