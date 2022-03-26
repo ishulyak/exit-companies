@@ -1,8 +1,7 @@
 package com.uawar.exit.company;
 
-import com.uawar.exit.dto.CompanyResponseDto;
+import com.uawar.exit.dto.DateCompaniesResponseDto;
 import lombok.AllArgsConstructor;
-import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -14,7 +13,7 @@ public class CompanyController {
     private final CompanyService companyService;
 
     @GetMapping("/company")
-    public List<CompanyResponseDto> findAll(final CompanySearchRequest companySearchRequest) {
+    public List<DateCompaniesResponseDto> findAll(final CompanySearchRequest companySearchRequest) {
         return companyService.findAll(companySearchRequest);
     }
 

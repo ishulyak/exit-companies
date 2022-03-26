@@ -1,6 +1,7 @@
 package com.uawar.exit.company;
 
 import com.uawar.exit.dto.CompanyResponseDto;
+import com.uawar.exit.dto.DateCompaniesResponseDto;
 import com.uawar.exit.mapper.CompanyMapper;
 import com.uawar.exit.repository.Company;
 import com.uawar.exit.repository.CompanyRepository;
@@ -11,7 +12,9 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -21,7 +24,7 @@ public class CompanyService {
     private final CompanyRepository companyRepository;
     private final CompanyMapper companyMapper;
 
-    public List<CompanyResponseDto> findAll(final CompanySearchRequest companySearchRequest) {
+    public List<DateCompaniesResponseDto> findAll(final CompanySearchRequest companySearchRequest) {
         Query query = new Query();
 
         if (CollectionUtils.isNotEmpty(companySearchRequest.getBusinessSector())) {
@@ -36,7 +39,22 @@ public class CompanyService {
 
         final List<Company> companies = mongoTemplate.find(query, Company.class);
 
-        return companyMapper.toDto(companies);
+        final List<CompanyResponseDto> companyResponseDtos = companyMapper.toDto(companies);
+
+        final Map<Instant, List<CompanyResponseDto>> dateToCompaniesMap = companyResponseDtos.stream()
+                .filter(companyResponseDto -> companyResponseDto.getAnnouncementDate() != null)
+                .collect(Collectors.groupingBy(CompanyResponseDto::getAnnouncementDate));
+
+        dateToCompaniesMap.put(null, companyResponseDtos.stream()
+                .filter(companyResponseDto -> companyResponseDto.getAnnouncementDate() == null)
+                .collect(Collectors.toList()));
+
+        return dateToCompaniesMap.entrySet().stream()
+                .map(e -> DateCompaniesResponseDto.builder()
+                        .announcementDate(e.getKey())
+                        .companies(e.getValue())
+                        .build())
+                .collect(Collectors.toList());
     }
 
     public List<String> getAllBusinessSectors() {
